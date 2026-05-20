@@ -39,9 +39,19 @@ public class EstadoService {
     }
 
     public Page<EstadoResponse> read(Pageable pageable) {
-        return estadoRepository.findAll(pageable).map(estadoMapper::estadoToResponse);
-    }
 
+        Page<EstadoResponse> estados =
+                estadoRepository.findAll(pageable)
+                        .map(estadoMapper::estadoToResponse);
+
+        if (estados.isEmpty()) {
+            throw new ResourceNotFoundException(
+                    "Não possui nenhum estado cadastrado"
+            );
+        }
+
+        return estados;
+    }
     public EstadoResponse readByUf(String uf) {
         Estado estado = estadoRepository.findByUf(uf)
                 .orElseThrow(() -> new ResourceNotFoundException("Estado não encontrado pela UF"));

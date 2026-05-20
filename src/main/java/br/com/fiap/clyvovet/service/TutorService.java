@@ -53,8 +53,18 @@ public class TutorService {
     }
 
     public Page<TutorResponse> read(Pageable pageable) {
-        return tutorRepository.findAll(pageable)
-                .map(tutorMapper::tutorToResponse);
+
+        Page<TutorResponse> tutores =
+                tutorRepository.findAll(pageable)
+                        .map(tutorMapper::tutorToResponse);
+
+        if (tutores.isEmpty()) {
+            throw new ResourceNotFoundException(
+                    "Não possui nenhum tutor cadastrado"
+            );
+        }
+
+        return tutores;
     }
 
     public TutorResponse readByCpf(String cpf) {

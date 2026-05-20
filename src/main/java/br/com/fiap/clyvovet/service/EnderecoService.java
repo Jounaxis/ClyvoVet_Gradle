@@ -68,8 +68,18 @@ public class EnderecoService {
     }
 
     public Page<EnderecoResponse> read(Pageable pageable) {
-        return enderecoRepository.findAll(pageable)
-                .map(enderecoMapper::enderecoToResponse);
+
+        Page<EnderecoResponse> enderecos =
+                enderecoRepository.findAll(pageable)
+                        .map(enderecoMapper::enderecoToResponse);
+
+        if (enderecos.isEmpty()) {
+            throw new ResourceNotFoundException(
+                    "Não possui nenhum endereço cadastrado"
+            );
+        }
+
+        return enderecos;
     }
 
     public Page<EnderecoResponse> readByCep(String cep, Pageable pageable) {

@@ -1,5 +1,6 @@
 package br.com.fiap.clyvovet.mapper;
 
+import br.com.fiap.clyvovet.controller.UsuarioController;
 import br.com.fiap.clyvovet.dto.response.UsuarioResponse;
 import br.com.fiap.clyvovet.model.Usuario;
 import org.springframework.hateoas.Link;

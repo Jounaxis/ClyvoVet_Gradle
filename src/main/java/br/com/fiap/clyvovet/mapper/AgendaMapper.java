@@ -1,5 +1,6 @@
 package br.com.fiap.clyvovet.mapper;
 
+import br.com.fiap.clyvovet.controller.AgendaController;
 import br.com.fiap.clyvovet.dto.response.AgendaResponse;
 import br.com.fiap.clyvovet.model.Agenda;
 import org.springframework.hateoas.Link;

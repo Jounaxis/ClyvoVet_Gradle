@@ -49,12 +49,37 @@ public class CidadeService {
     }
 
     public Page<CidadeResponse> read(Pageable pageable) {
-        return cidadeRepository.findAll(pageable).map(cidadeMapper::cidadeToResponse);
+
+        Page<CidadeResponse> cidades =
+                cidadeRepository.findAll(pageable)
+                        .map(cidadeMapper::cidadeToResponse);
+
+        if (cidades.isEmpty()) {
+            throw new ResourceNotFoundException(
+                    "Não possui nenhuma cidade cadastrada"
+            );
+        }
+
+        return cidades;
     }
 
-    public Page<CidadeResponse> readByNome(String nome, Pageable pageable) {
-        return cidadeRepository.findByNomeContainingIgnoreCase(nome, pageable)
-                .map(cidadeMapper::cidadeToResponse);
+    public Page<CidadeResponse> readByNome(
+            String nome,
+            Pageable pageable
+    ) {
+
+        Page<CidadeResponse> cidades =
+                cidadeRepository
+                        .findByNomeContainingIgnoreCase(nome, pageable)
+                        .map(cidadeMapper::cidadeToResponse);
+
+        if (cidades.isEmpty()) {
+            throw new ResourceNotFoundException(
+                    "Nenhuma cidade encontrada com esse nome"
+            );
+        }
+
+        return cidades;
     }
 
     //UPDATE

@@ -57,8 +57,18 @@ public class AnexoService {
     }
 
     public Page<AnexoResponse> read(Pageable pageable) {
-        return anexoRepository.findAll(pageable)
-                .map(anexoMapper::anexoToResponse);
+
+        Page<AnexoResponse> anexos =
+                anexoRepository.findAll(pageable)
+                        .map(anexoMapper::anexoToResponse);
+
+        if (anexos.isEmpty()) {
+            throw new ResourceNotFoundException(
+                    "Não possui nenhum anexo cadastrado"
+            );
+        }
+
+        return anexos;
     }
 
     public Page<AnexoResponse> readByTipoArquivo(TipoArquivo tipoArquivo, Pageable pageable) {

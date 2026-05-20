@@ -48,9 +48,19 @@ public class BairroService {
     }
 
     public Page<BairroResponse> read(Pageable pageable) {
-        return bairroRepository.findAll(pageable).map(bairroMapper::bairroToResponse);
-    }
 
+        Page<BairroResponse> bairros =
+                bairroRepository.findAll(pageable)
+                        .map(bairroMapper::bairroToResponse);
+
+        if (bairros.isEmpty()) {
+            throw new ResourceNotFoundException(
+                    "Não possui nenhum bairro cadastrado"
+            );
+        }
+
+        return bairros;
+    }
     public Page<BairroResponse> readByNome(String nome, Pageable pageable) {
         return bairroRepository.findByNomeContainingIgnoreCase(nome, pageable)
                 .map(bairroMapper::bairroToResponse);

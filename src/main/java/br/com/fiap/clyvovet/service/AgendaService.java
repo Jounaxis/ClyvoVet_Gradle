@@ -53,8 +53,18 @@ public class AgendaService {
     }
 
     public Page<AgendaResponse> read(Pageable pageable) {
-        return agendaRepository.findAll(pageable)
-                .map(agendaMapper::agendaToResponse);
+
+        Page<AgendaResponse> agendas =
+                agendaRepository.findAll(pageable)
+                        .map(agendaMapper::agendaToResponse);
+
+        if (agendas.isEmpty()) {
+            throw new ResourceNotFoundException(
+                    "Não possui nenhuma agenda cadastrada"
+            );
+        }
+
+        return agendas;
     }
 
     public Page<AgendaResponse> readByPeriodo(LocalDateTime inicio, LocalDateTime fim, Pageable pageable) {

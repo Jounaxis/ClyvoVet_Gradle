@@ -44,8 +44,18 @@ public class UsuarioService {
     }
 
     public Page<UsuarioResponse> read(Pageable pageable) {
-        return usuarioRepository.findAll(pageable)
-                .map(usuarioMapper::usuarioToResponse);
+
+        Page<UsuarioResponse> usuarios =
+                usuarioRepository.findAll(pageable)
+                        .map(usuarioMapper::usuarioToResponse);
+
+        if (usuarios.isEmpty()) {
+            throw new ResourceNotFoundException(
+                    "Não possui nenhum usuário cadastrado"
+            );
+        }
+
+        return usuarios;
     }
 
     public UsuarioResponse readByEmail(String email) {

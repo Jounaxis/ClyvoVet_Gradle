@@ -59,8 +59,18 @@ public class NotificacaoService {
     }
 
     public Page<NotificacaoResponse> read(Pageable pageable) {
-        return notificacaoRepository.findAll(pageable)
-                .map(notificacaoMapper::notificacaoToResponse);
+
+        Page<NotificacaoResponse> notificacoes =
+                notificacaoRepository.findAll(pageable)
+                        .map(notificacaoMapper::notificacaoToResponse);
+
+        if (notificacoes.isEmpty()) {
+            throw new ResourceNotFoundException(
+                    "Não possui nenhuma notificação cadastrada"
+            );
+        }
+
+        return notificacoes;
     }
 
     public Page<NotificacaoResponse> readByLida(String lida, Pageable pageable) {
