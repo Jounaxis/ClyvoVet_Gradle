@@ -1,5 +1,7 @@
 package br.com.fiap.clyvovet.dto.response;
 
+import org.springframework.hateoas.Link;
+
 public record EnderecoResponse(
         Integer enderecoId,
         String logradouro,
@@ -9,6 +11,7 @@ public record EnderecoResponse(
         Double latitude,
         Double longitude,
         Integer usuarioId,
-        Integer bairroId
+        Integer bairroId,
+        Link link
 ) {
 }

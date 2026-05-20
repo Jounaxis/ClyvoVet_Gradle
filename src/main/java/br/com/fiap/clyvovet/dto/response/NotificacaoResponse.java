@@ -1,5 +1,7 @@
 package br.com.fiap.clyvovet.dto.response;
 
+import org.springframework.hateoas.Link;
+
 import java.time.LocalDateTime;
 
 public record NotificacaoResponse(
@@ -7,6 +9,7 @@ public record NotificacaoResponse(
         String mensagem,
         LocalDateTime dataEnvio,
         String lida,
-        Integer usuarioId
+        Integer usuarioId,
+        Link link
 ) {
 }

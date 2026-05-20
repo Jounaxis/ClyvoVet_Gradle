@@ -1,6 +1,7 @@
 package br.com.fiap.clyvovet.dto.response;
 
 import br.com.fiap.clyvovet.model.TipoArquivo;
+import org.springframework.hateoas.Link;
 
 import java.time.LocalDateTime;
 
@@ -11,7 +12,8 @@ public record AnexoResponse(
         String url,
         Double tamanhoKb,
         LocalDateTime dataCriacao,
-        Integer usuarioId
+        Integer usuarioId,
+        Link link
 
 ) {
 }

@@ -1,5 +1,7 @@
 package br.com.fiap.clyvovet.dto.response;
 
+import org.springframework.hateoas.Link;
+
 import java.time.LocalDate;
 
 public record TutorResponse(
@@ -8,6 +10,7 @@ public record TutorResponse(
         String cpf,
         String telefone,
         LocalDate dataNascimento,
-        Integer usuarioId
+        Integer usuarioId,
+        Link link
 ) {
 }
