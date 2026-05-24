@@ -1,110 +1,317 @@
-# ClyvoVet API
+# ClyvoVet API - DevOps com Docker e Azure
 
-## Descrição
+Projeto Java desenvolvido com Spring Boot, Gradle, Docker, Docker Compose, MySQL e Azure.
 
-O ClyvoVet é uma API REST desenvolvida em Java com Spring Boot, criada para auxiliar tutores de pets no gerenciamento de informações importantes relacionadas aos cuidados com seus animais.
-
-A aplicação permite cadastrar, consultar, atualizar e remover dados de usuários, tutores, endereços, agendas, notificações e anexos, utilizando persistência em banco de dados Oracle.
-
-Além das operações básicas de CRUD, o projeto disponibiliza buscas específicas por parâmetros, paginação, ordenação, validações, tratamento de exceções e documentação com Swagger/OpenAPI.
+O objetivo deste projeto é realizar o provisionamento de uma infraestrutura em nuvem utilizando Azure CLI, executar uma aplicação Java em uma Máquina Virtual Linux na Azure e utilizar Docker para orquestrar a API e o banco de dados MySQL.
 
 ---
 
-## Objetivo do Projeto
-
-O objetivo da solução é centralizar informações relevantes para tutores de pets, facilitando o acesso a dados cadastrais, endereços, documentos anexados, compromissos agendados e notificações.
-
-Dessa forma, a API contribui para uma melhor organização das informações e evita que dados importantes fiquem espalhados em diferentes locais.
-
----
-
-## Tecnologias Utilizadas
+## Tecnologias utilizadas
 
 - Java 21
 - Spring Boot
-- Spring Web
-- Spring Data JPA
-- Hibernate
-- Oracle Database
 - Gradle
-- Bean Validation
-- Swagger / OpenAPI
-- Spring HATEOAS
+- MySQL 8.0
+- Docker
+- Docker Compose
+- Docker Hub
+- Azure CLI
+- Máquina Virtual Linux Ubuntu 22.04
 
 ---
 
-## Funcionalidades
+## Arquitetura da solução
 
-A API possui funcionalidades para gerenciamento das seguintes entidades:
+A arquitetura do projeto foi organizada em três partes principais:
 
-- Estado
-- Cidade
-- Bairro
-- Usuário
-- Endereço
-- Tutor
-- Agenda
-- Notificação
-- Anexo
+1. Ambiente de desenvolvimento local
+2. Docker Hub
+3. Ambiente em nuvem na Azure
+
+![Diagrama da Arquitetura DevOps](./docs/diagrama-devops.png)
 
 ---
 
-## Funcionalidades além do CRUD
+## Descrição da arquitetura
 
-A aplicação não se limita apenas às operações básicas de cadastro, listagem, atualização e remoção.
+No ambiente local, o projeto foi desenvolvido utilizando IntelliJ IDEA.  
+Após a implementação da aplicação Java, foram adicionados os arquivos `Dockerfile` e `docker-compose.yml`.
 
-Foram implementadas consultas específicas para facilitar o uso da API:
+A imagem da aplicação foi gerada localmente com tag de versão e enviada para o Docker Hub.
 
-- Busca de estado por UF
-- Busca de cidade por nome
-- Busca de bairro por nome
-- Busca de usuário por email
-- Busca de endereço por CEP
-- Busca de tutor por CPF
-- Busca de agenda por período
-- Busca de notificação por status de leitura
-- Busca de anexo por tipo de arquivo
+Imagem publicada:
 
-Também foram implementados:
+```bash
+jounax/clyvovet-api:v1
+````
 
-- Paginação de resultados
-- Ordenação de resultados
-- Validação de campos com Bean Validation
-- Tratamento global de exceções
-- DTOs de Request e Response
-- Links HATEOAS nas respostas
-- Documentação dos endpoints com Swagger
+Na Azure, foi provisionada uma Máquina Virtual Linux utilizando um script criado com Azure CLI.
+
+Dentro da VM, a aplicação é executada com Docker Compose, utilizando dois containers principais:
+
+* `clyvovet-api`: container da API Java Spring Boot
+* `clyvovet-mysql`: container do banco de dados MySQL
+
+A aplicação se comunica com o banco pela rede interna do Docker Compose.
 
 ---
-Swagger
 
-Com a aplicação em execução, a documentação da API pode ser acessada em:http://localhost:8080/swagger-ui/index.html
+## Recursos provisionados na Azure
 
-## Banco de Dados
+A infraestrutura foi provisionada na região:
 
-O projeto utiliza Oracle Database como SGBD relacional.
+```text
+South Africa North
+```
 
-A persistência dos dados é feita com Spring Data JPA e Hibernate.
+Recursos utilizados:
 
-Exemplo de configuração no `application.properties`:
+```text
+Resource Group: rg-clyvovet-devops
+Virtual Machine: vm-clyvovet-devops
+Virtual Network: vnet-clyvovet-devops
+Network Security Group: vm-clyvovet-devopsNSG
+```
+
+Portas liberadas na VM:
+
+```text
+22    SSH
+80    HTTP
+443   HTTPS
+8080  API Java Spring Boot
+```
+
+A porta `3306` do MySQL é utilizada internamente entre os containers e não precisa ser exposta publicamente na Azure.
 
 ---
-POSTMAN
 
-A collection do Postman contendo todos os endpoints da aplicação pode ser acessada abaixo:
+## Docker Hub
 
-- [Collection Postman](https://rm561802-3342259.postman.co/workspace/Maria-Luiza's-Workspace~ac5f82b0-f3ee-4446-8623-b6750534d59b/collection/55091734-6fa414e0-7523-4c60-811e-ff657fd5dae6?action=share&source=copy-link&creator=55091734)
+A imagem da aplicação foi versionada e enviada para o Docker Hub:
 
+```bash
+jounax/clyvovet-api:v1
+```
 
+Comandos utilizados localmente:
 
-```properties
-spring.datasource.url=jdbc:oracle:thin:@oracle.fiap.com.br:1521:ORCL
-spring.datasource.username=SERA ENVIADO PARA O PROFESSOR
-spring.datasource.password=SERA ENVIADO PARA O PROFESSOR
-spring.datasource.driver-class-name=oracle.jdbc.OracleDriver
+```bash
+docker login
+docker compose build
+docker push jounax/clyvovet-api:v1
+```
 
-spring.jpa.database-platform=org.hibernate.dialect.OracleDialect
-spring.jpa.hibernate.ddl-auto=update
-spring.jpa.show-sql=true
-spring.jpa.properties.hibernate.format_sql=true
+---
 
+## Docker Compose
+
+O projeto utiliza Docker Compose para executar a aplicação e o banco de dados em conjunto.
+
+Serviços definidos:
+
+```text
+clyvovet-api
+clyvovet-mysql
+```
+
+Rede Docker:
+
+```text
+clyvovet-network
+```
+
+Volume nomeado para persistência dos dados do banco:
+
+```text
+clyvovet-mysql-data
+```
+
+Esse volume garante que os dados do MySQL sejam mantidos mesmo que o container seja removido.
+
+---
+
+## Execução em background
+
+A aplicação é executada em background utilizando:
+
+```bash
+docker compose up -d
+```
+
+O parâmetro `-d` executa os containers em modo detached, ou seja, em segundo plano.
+
+---
+
+## Usuário sem privilégios administrativos
+
+A aplicação Java é executada no container com um usuário sem privilégios administrativos.
+
+No `Dockerfile`, foi definido:
+
+```dockerfile
+RUN useradd -m appuser
+USER appuser
+```
+
+Dessa forma, o container da aplicação não executa o processo Java como usuário root.
+
+---
+
+## Provisionamento da VM com Azure CLI
+
+A criação da infraestrutura é realizada por meio de um script Bash com comandos Azure CLI.
+
+O script realiza as seguintes tarefas:
+
+1. Cria o Resource Group
+2. Cria uma Máquina Virtual Linux Ubuntu
+3. Abre as portas necessárias no NSG
+4. Instala Docker
+5. Instala Docker Compose
+6. Instala ferramentas auxiliares como Git, nano, curl e unzip
+
+Após a criação da VM, o script exibe o IP público para acesso SSH e para teste da API.
+
+---
+
+## Execução na VM Azure
+
+Após criar a VM, acesse via SSH:
+
+```bash
+ssh rm560907@IP_PUBLICO_DA_VM
+```
+
+Clone o repositório:
+
+```bash
+git clone https://github.com/Jounaxis/ClyvoVet_Gradle
+```
+
+Entre na pasta do projeto:
+
+```bash
+cd ClyvoVet_Gradle
+```
+
+Faça login no Docker Hub:
+
+```bash
+docker login
+```
+
+Baixe as imagens definidas no Docker Compose:
+
+```bash
+docker compose pull
+```
+
+Execute a aplicação e o banco em background:
+
+```bash
+docker compose up -d
+```
+
+Verifique se os containers estão em execução:
+
+```bash
+docker ps
+```
+
+---
+
+## Teste externo da aplicação
+
+Com a aplicação em execução, acesse pelo navegador:
+
+```text
+http://IP_PUBLICO_DA_VM:8080
+```
+
+Swagger:
+
+```text
+http://IP_PUBLICO_DA_VM:8080/swagger-ui.html
+```
+
+ou:
+
+```text
+http://IP_PUBLICO_DA_VM:8080/swagger-ui/index.html
+```
+
+---
+
+## Comandos úteis
+
+Ver containers em execução:
+
+```bash
+docker ps
+```
+
+Ver logs da API:
+
+```bash
+docker logs clyvovet-api
+```
+
+Ver logs do MySQL:
+
+```bash
+docker logs clyvovet-mysql
+```
+
+Ver volumes criados:
+
+```bash
+docker volume ls
+```
+
+Parar os containers:
+
+```bash
+docker compose down
+```
+
+Parar os containers e remover volumes:
+
+```bash
+docker compose down -v
+```
+
+---
+
+## Requisitos atendidos
+
+### 01 - Script Azure CLI
+
+O projeto possui um script completo em Bash utilizando Azure CLI para:
+
+* Provisionar uma Máquina Virtual Linux na Azure
+* Abrir as portas necessárias ao projeto
+* Instalar Docker na VM criada
+* Instalar ferramentas necessárias, como Git, nano, curl e unzip
+
+### 02 - Execução da aplicação com Docker na VM
+
+A aplicação Java e o banco MySQL são executados na VM utilizando Docker Compose.
+
+Requisitos atendidos:
+
+* Projeto executando em background com `docker compose up -d`
+* Aplicação rodando com usuário sem privilégios administrativos
+* Banco MySQL utilizando volume nomeado para persistência dos dados
+
+Volume utilizado:
+
+```text
+clyvovet-mysql-data
+```
+
+Imagem versionada:
+
+```text
+jounax/clyvovet-api:v1
+```
